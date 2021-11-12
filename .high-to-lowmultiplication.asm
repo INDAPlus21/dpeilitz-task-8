@@ -39,9 +39,7 @@ main:
 	li $v0, 1
 	syscall
 	
-	#exit program DO NOT DELETE AGAIN
-	li $v0, 10
-	syscall
+	j	exit_program
 	
 multiply:
 	PUSH($s0)
@@ -81,3 +79,7 @@ faculty:
 		POP ($s3)
 	
 		j final
+		
+exit_program:
+	li $v0, 10
+	syscall

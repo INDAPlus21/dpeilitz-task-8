@@ -1,4 +1,4 @@
-#The majority of this code is ripped from Ogronmans excellent example
+#The majority of this code is heavily inspired by Ogronmans excellent example
 ### Data Declaration Section ###
 
 .data
@@ -6,7 +6,7 @@
 primes:		.space  1000            # reserves a block of 1000 bytes in application memory
 err_msg:	.asciiz "Invalid input! Expected integer n, where 1 < n < 1001.\n"
 out_msg: 	.asciiz "The prime numbers are:\n"
-inbetween: 	.asciiz ", \n"
+inbetween: 	.asciiz ", "
 
 ### Executable Code Section ###
 
@@ -30,6 +30,7 @@ main:
     # initialise primes array
     la	    $t0,primes              # $s1 = address of the first element in the array
     add     $t1, $0, $v0
+    add     $t1, $t1, 1
     li 	    $t2,0
     li	    $t3,1
 init_loop:
@@ -39,7 +40,6 @@ init_loop:
     bne	    $t2, $t1, init_loop     # loop if counter != 999
     
     ### Continue implementation of Sieve of Eratosthenes ###
-	
 	sieve_loop:
 	add $t3, $t3, 1
 	mul $t2, $t3, $t3
@@ -65,23 +65,30 @@ init_loop:
     	add $t2, $t2, 1
     	add $t0, $t0, $t2
     	lb $t3, ($t0)
-    	bgt $t3, $0, skip_print
+    	bge $t2, $t1, exit_program	#exit program if the loop has run more times than input
+  
+    	beq $t3, $0, skip_print 	#skip if zero
+    	
+    	#print inbetween stuff
+    	bgt $t2, 2, space
+    	return_space:
     	
     	#print message
     	li $v0, 1
     	add $a0, $0, $t2 
     	syscall
-    	
-    	li $v0, 4
-    	la $a0, inbetween 
-    	syscall
-    	
+   
     	ble $t2, $t1, print_loop
     	
     skip_print:
-    	add $t2, $t2, 1
     	j print_loop
     	
+    space: #add ", " inbetween numbers
+    	li $v0, 4
+    	la $a0, inbetween 
+    	syscall
+    	j	return_space
+
     # exit program
     j       exit_program
     nop
